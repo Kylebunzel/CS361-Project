@@ -13,7 +13,7 @@ class TextFileInterface(DataInterface.DataInterface):
 
     def create_account(self, account_name, password, role):
         hash = hashlib.new("md5")
-        hash.update(b"{password}")
+        hash.update(f"{password}".encode("ascii"))
         hashed_password = hash.hexdigest()
         account_file = open(self.account_filename, "a")
         account_file.write(f"{account_name}:{hashed_password}:{role}\n")
