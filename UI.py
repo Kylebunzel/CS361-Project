@@ -1,25 +1,25 @@
-import Login
-import Logout
-import CreateAccount
-import DeleteAccount
 import TextFileInterface
-import CreateCourse
-import AssignCourse
+from Components import LabCommands, CourseCommands, AccountCommands, Login, Logout
 
-class UI(object):
+
+class UI:
     # dictionary matching strings to commands
-    database = TextFileInterface.TextFileInterface()
+    def __init__(self, environment):
+        self.environment = environment
+        self.commands = {
+            "login": Login.Login(self.environment),
+            "logout": Logout.Logout(self.environment),
+            "create_account": AccountCommands.CreateAccount(self.environment),
+            "delete_account": AccountCommands.DeleteAccount(self.environment),
+            "view_accounts": AccountCommands.ViewAccounts(self.environment),
+            "create_course": CourseCommands.CreateCourse(self.environment),
+            "assign_course": CourseCommands.AssignCourse(self.environment),
+            "create_lab": LabCommands.CreateLab(self.environment),
+            "assign_lab": LabCommands.AssignLab(self.environment),
+            "view_labs": LabCommands.ViewLabs(self.environment)
+        }
 
-    commands = {
-        "login": Login.Login(database),
-        "logout": Logout.Logout(database),
-        "create_account": CreateAccount.CreateAccount(),
-        "delete_account": DeleteAccount.DeleteAccount(),
-        "create_course": CreateCourse.CreateCourse(),
-        "assign_course": AssignCourse.AssignCourse()
-    }
-
-    def command(self, string, user):
+    def command(self, string):
         # parse input into a list, splitting by strings
         args = self.parse_commands(string)
 
@@ -28,9 +28,9 @@ class UI(object):
 
         # if command is valid initiate its action
         if args[0] in valid_args:
-            return self.commands[args[0]].action(args, user)
+            return self.commands[args[0]].action(args)
         else:
-            print("Invalid Command")
+            return "Invalid Command"
 
     # input: command of type string
     # return: list of command separated by spaces

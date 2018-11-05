@@ -21,46 +21,46 @@ class CreateAccountTest(unittest.TestCase):
             - username
             - password
             The response is a string of either:
-            - "Account Created" if successful
-            - "Error in creating account" if unsuccessful
+            - "Account created." if successful
+            - "Error creating account." if unsuccessful
     """
 
     def test_command_create_account_supervisor(self):
 
         # login as supervisor
         self.ui.command("login userSupervisor password")
-        self.assertEquals("create_account john password ta", "Account Created")
+        self.assertEquals("create_account john password ta", "Account created.")
 
     def test_command_create_account_administrator(self):
 
         # login as administrator
         self.ui.command("login userAdministrator password")
-        self.assertEquals("create_account adam password supervisor", "Account Created")
+        self.assertEquals("create_account adam password supervisor", "Account created.")
 
     def test_command_create_account_instructor(self):
 
         # login as instructor
         self.ui.command("login userInstructor password")
         # instructor cannot create accounts
-        self.assertEquals("create_account aaron password instructor", "error in creating account")
+        self.assertEquals("create_account aaron password instructor", "Error creating account.")
 
     def test_command_create_account_TA(self):
 
         # login as TA
         self.ui.command("login TA password")
         # TA cannot create accounts
-        self.assertEquals("create_account tim@uwm.edu tim password", "Error in creating account")
+        self.assertEquals("create_account tim@uwm.edu tim password", "Error creating account.")
 
     def test_command_create_account_format(self):
         # login as administrator
         self.ui.command("login userAdministrator password")
 
-        self.assertEquals("create_account", "Error in creating account")
-        self.assertEquals("create_account tyler", "Error in creating account")
-        self.assertEquals("create_account james", "Error in creating account")
-        self.assertEquals("create_account jim password", "Error in creating account")
+        self.assertEquals("create_account", "Error creating account.")
+        self.assertEquals("create_account tyler", "Error creating account.")
+        self.assertEquals("create_account james", "Error creating account.")
+        self.assertEquals("create_account jim password", "Error creating account.")
 
     def test_command_create_account_duplicate(self):
         # login as supervisor
         self.ui.command("login userSupervisor password")
-        self.assertEquals("create_account userTA password instructor", "Error in creating account")
+        self.assertEquals("create_account userTA password instructor", "Error creating account.")
