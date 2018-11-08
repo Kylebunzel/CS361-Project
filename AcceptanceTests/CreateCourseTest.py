@@ -1,9 +1,23 @@
 import unittest
+import UI, Environment
+import TextFileInterface
 
 
 class CreateCourseTests(unittest.TestCase):
     def setUp(self):
-        self.ui = UI()
+        tfi = TextFileInterface.TextFileInterface(relative_directory="../UnitTests/TestDB/")
+        tfi.clear_database()
+
+        tfi.create_account("userSupervisor", "userPassword", "supervisor")
+        tfi.create_account("userAdministrator", "userPassword", "administrator")
+        tfi.create_account("userInstructor", "userPassword", "instructor")
+        tfi.create_account("userTA", "userPassword", "TA")
+
+        tfi.create_course("361", "CompSci361")
+        tfi.create_lab("361", "801")
+
+        environment = Environment.Environment(tfi, DEBUG=True)
+        self.ui = UI.UI(environment)
 
     def test_command_create_course_supervisor(self):
         """
@@ -22,37 +36,34 @@ class CreateCourseTests(unittest.TestCase):
         self.ui.command("login userSupervisor userPassword")
 
         # Command: "create_course 361 SystemsProgramming", expect success
-        self.assertEquals(self.ui.command("create_course 361 SystemsProgramming"), "Created course.")
+        self.assertEqual(self.ui.command("create_course 337 SystemsProgramming"), "Created course.")
 
     def test_command_create_course_administrator(self):
-        self.ui.command("create_account userAdministrator userPassword administrator")
         self.ui.command("login userAdministrator userPassword")
-        self.assertEquals(self.ui.command("create_course 361 SystemsProgramming"), "Created course.")
+        self.assertEqual(self.ui.command("create_course 337 SystemsProgramming"), "Created course.")
 
     def test_command_create_course_instructor(self):
         self.ui.command("create_account userInstructor userPassword instructor")
         self.ui.command("login userInstructor userPassword")
-        self.assertEquals(self.ui.command("create_course 361 SystemsProgramming"),
+        self.assertEqual(self.ui.command("create_course 361 SystemsProgramming"),
                           "Error creating course.")
 
     def test_command_create_course_TA(self):
-        self.ui.command("create_account userTA userPassword ta")
         self.ui.command("login userInstructor userPassword")
-        self.assertEquals(self.ui.command("create_course 361 SystemsProgramming"),
+        self.assertEqual(self.ui.command("create_course 361 SystemsProgramming"),
                           "Error creating course.")
 
     def test_command_create_course_format(self):
         # Command: "create_course", expect error, not enough arguments
         self.ui.command("create_account userSupervisor userPassword supervisor")
         self.ui.command("login userSupervisor userPassword")
-        self.assertEquals(self.ui.command("create_course"), "Error creating course.")
-        self.assertEquals(self.ui.command("create_course 361"), "Error creating course.")
-        self.assertEquals(self.ui.command("create_course SystemProgramming"), "Error creating course.")
-        self.assertEquals(self.ui.command("create_course SystemsProgramming 361"), "Erro creating course.")
+        self.assertEqual(self.ui.command("create_course"), "Error creating course.")
+        self.assertEqual(self.ui.command("create_course 361"), "Error creating course.")
+        self.assertEqual(self.ui.command("create_course SystemProgramming"), "Error creating course.")
+        self.assertEqual(self.ui.command("create_course SystemsProgramming 361"), "Error creating course.")
 
 
     def test_command_create_course_duplicate(self):
         self.ui.command("create_account userSupervisor userPassword supervisor")
         self.ui.command("login userSupervisor userPassword")
-        self.assertEquals(self.ui.command("create_course 361 SystemsProgramming"), "Created course.")
-        self.assertEquals(self.ui.command("create_course 361 SystemsProgramming"), "Error creating course.")
+        self.assertEqual(self.ui.command("create_course 361 SystemsProgramming"), "Error creating course.")

@@ -1,9 +1,15 @@
 import unittest
+import TextFileInterface
+import Environment
+import UI
 
 
 class ContactInfoTests(unittest.TestCase):
     def setUp(self):
-        self.ui = UI()
+        tfi = TextFileInterface.TextFileInterface(relative_directory="../UnitTests/TestDB/")
+        tfi.clear_database()
+        environment = Environment.Environment(tfi)
+        self.ui = UI.UI(environment)
 
     def test_command_view_public_info(self):
         """
@@ -14,16 +20,16 @@ class ContactInfoTests(unittest.TestCase):
             - username
 
             The response is a string:
-            - If successful: "Username: user, Email: email"
+            - If successful: "username role"
             - If failure: "Username does not exist"
         """
         # Create a TA account and log in as part of the setup
-       # self.ui.command("create_account userTA userPassword TA")
-       # self.ui.command("login userTA userPassword")
+        self.ui.command("create_account userTA userPassword TA")
+        self.ui.command("login userTA userPassword")
 
         # view own contact info, expect success
-        self.assertEquals(self.ui.command("view_info"), "Username: erin, Email: erinfink@uwm.edu, "
-                                                        "Phone number: 1231231234, "
+        self.assertEquals(self.ui.command("view_info"), "erin erinfink@uwm.edu\n"
+                                                        "Phone number: 1231231234,"
                                                         "Address: 2311 E Hartford Ave Milwaukee, WI 53211")
         # Command: "view_info user", expect success
         self.assertEquals(self.ui.command("view_info Erin"), "Username: erin, Email: erinfink@uwm.edu")
