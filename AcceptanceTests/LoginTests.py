@@ -1,9 +1,17 @@
 import unittest
+import UI, Environment
+import TextFileInterface
 
 
 class LoginTests(unittest.TestCase):
-    def setup(self):
-        self.ui.command("create_user Instructor InstructorPassword instructor")
+    def setUp(self):
+        tfi = TextFileInterface.TextFileInterface(relative_directory="../UnitTests/TestDB/")
+        tfi.clear_database()
+
+        tfi.create_account("Instructor", "InstructorPassword", "instructor")
+
+        environment = Environment.Environment(tfi, DEBUG=True)
+        self.ui = UI.UI(environment)
 
     """
         When the login command is entered, it takes two arguments:

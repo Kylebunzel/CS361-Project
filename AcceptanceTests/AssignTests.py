@@ -1,13 +1,25 @@
 import unittest
+import UI, Environment
+import TextFileInterface
 
 
 class AssignTests(unittest.TestCase):
 
     def setUp(self):
-        self.ui.command("create_account Supervisor SupervisorPassword supervisor")
-        self.ui.command("create_account Administrator AdministratorPassword administrator")
-        self.ui.command("create_account Instructor InstructorPassword instructor")
-        self.ui.command("create_account TA TAPassword ta")
+        tfi = TextFileInterface.TextFileInterface(relative_directory="../UnitTests/TestDB/")
+        tfi.clear_database()
+
+        tfi.create_account("Supervisor", "SupervisorPassword", "supervisor")
+        tfi.create_account("Administrator", "AdministratorPassword", "administrator")
+        tfi.create_account("Instructor", "InstructorPassword", "instructor")
+        tfi.create_account("TA", "TAPassword", "TA")
+
+        tfi.create_course("361", "CompSci361")
+        tfi.create_lab("361", "801")
+
+        environment = Environment.Environment(tfi, DEBUG=True)
+        self.ui = UI.UI(environment)
+
     """
         When assign_lab command is entered, it takes two arguments:
         - TA Name
@@ -19,17 +31,17 @@ class AssignTests(unittest.TestCase):
     def test_assign_lab_by_supervisor_success(self):
         # Command: "assign_lab apoorv 361", expect success
         self.ui.command("login Supervisor SupervisorPassword")
-        self.assertEqual(self.ui.command("assign_lab 361 801 TA"), "Assigned to lab")
+        self.assertEqual(self.ui.command("assign_lab 361 801 TA"), "Assigned to lab.")
 
-    def test_assign_lab_by_administrator_sucess(self):
+    def test_assign_lab_by_administrator_fail(self):
         # Command: "assign_lab TA 361", expect success
         self.ui.command("login Administrator AdministratorPassword")
-        self.assertEqual(self.ui.command("assign_lab 361 TA"), "Assigned to lab")
+        self.assertEqual(self.ui.command("assign_lab 361 TA"), "Error assigning to lab.")
 
     def test_assign_lab_by_ta_fail(self):
         # Command: "assign_lab TA 361 801", expect fail
         self.ui.command("login TA TAPassword")
-        self.assertEqual(self.ui.command("assign_lab 361 801 TA"), "Error assigning to lab")
+        self.assertEqual(self.ui.command("assign_lab 361 801 TA"), "Error assigning to lab.")
 
     def test_assign_lab_no_class_given(self):
         # Command: "assign_lab TA", expect failure (no class given)
@@ -44,7 +56,7 @@ class AssignTests(unittest.TestCase):
     def test_assign_lab_not_a_ta(self):
         # Command: "assign_lab Instructor 361", expect failure (not a TA)
         self.ui.command("login Supervisor SupervisorPassword")
-        self.assertEqual(self.ui.command("assign_lab 361 Instructor"), "Error assigning to class.")
+        self.assertEqual(self.ui.command("assign_lab 361 Instructor"), "Error assigning to lab.")
 
     """
         When assign_course command is entered, it takes two arguments:
@@ -57,7 +69,9 @@ class AssignTests(unittest.TestCase):
     def test_assign_course_by_supervisor(self):
         # Command: "assign_course 361 Instructor ", expect success
         self.ui.command("login Supervisor SupervisorPassword")
-        self.assertEqual(self.ui.command("assign_course 361 Instructor"), "Assigned to course.")
+
+        response = self.ui.command("assign_course 361 Instructor")
+        self.assertEqual(response, "Assigned to course.")
 
     def test_assign_course_by_instructor(self):
         # Command: "assign_course 361 Instructor", expect failure
@@ -96,7 +110,9 @@ class AssignTests(unittest.TestCase):
     def test_assign_lab(self):
         # Command: "assign_lab 361 801 TA", expect success
         self.ui.command("login Supervisor SupervisorPassword")
-        self.assertEqual(self.ui.command("assign_lab TA 361 801"), "Assigned to lab.")
+
+        response = self.ui.command("assign_lab 361 801 TA")
+        self.assertEqual(response, "Assigned to lab.")
 
     def test_assign_lab_no_class(self):
         # Command: "assign_lab TA", expect failure (no class or lab given)
@@ -106,7 +122,7 @@ class AssignTests(unittest.TestCase):
     def test_assign_lab_no_args(self):
         # Command: "assign_lab", expect failure (no ta name given)
         self.ui.command("login Supervisor SupervisorPassword")
-        self.assertEqual(self.ui.command("assign_lab"), "Error assigning to lab.")
+        self.assertEqual(self.ui.command("assign_lab TA 361 801"), "Error assigning to lab.")
 
     def test_assign_lab_not_ta(self):
         # Command: "assign_lab 361 801 Instructor", expect failure (not a TA)

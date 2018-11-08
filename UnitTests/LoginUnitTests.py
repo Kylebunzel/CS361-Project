@@ -14,12 +14,16 @@ class LoginUnitTests(TestCase):
 
     def test_not_enough_args(self):
         login = Login(self.environment)
-        login.action(["login", "testuser"])
+        response = login.action(["login", "testuser"])
+
+        self.assertEqual(response, "Error logging in.")
         self.assertIsNone(self.environment.user)
 
     def test_too_many_args(self):
         login = Login(self.environment)
-        login.action(["login", "testuser", "1234", "foo"])
+        response = login.action(["login", "testuser", "1234", "foo"])
+
+        self.assertEqual(response, "Error logging in.")
         self.assertIsNone(self.environment.user)
 
     def test_already_logged_in(self):
@@ -35,23 +39,31 @@ class LoginUnitTests(TestCase):
     def test_wrong_username(self):
         self.environment.database.create_account("testuser", "1234", "supervisor")
         login = Login(self.environment)
-        login.action(["login", "testuse", "1234"])
+        response = login.action(["login", "testuse", "1234"])
+
+        self.assertEqual(response, "Error logging in.")
         self.assertIsNone(self.environment.user)
 
     def test_wrong_password(self):
         self.environment.database.create_account("testuser", "1234", "supervisor")
         login = Login(self.environment)
-        login.action(["login", "testuser", "4321"])
+        response = login.action(["login", "testuser", "4321"])
+
+        self.assertEqual(response, "Error logging in.")
         self.assertIsNone(self.environment.user)
 
     def test_wrong_both(self):
         self.environment.database.create_account("testuser", "1234", "supervisor")
         login = Login(self.environment)
-        login.action(["login", "testuse", "123"])
+        response = login.action(["login", "testuse", "123"])
+
+        self.assertEqual(response, "Error logging in.")
         self.assertIsNone(self.environment.user)
 
     def test_all_correct(self):
         self.environment.database.create_account("testuser", "1234", "supervisor")
         login = Login(self.environment)
-        login.action(["login", "testuser", "1234"])
+        response = login.action(["login", "testuser", "1234"])
+
+        self.assertEqual(response, "Logged in.")
         self.assertIsNotNone(self.environment.user)

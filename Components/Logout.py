@@ -13,6 +13,10 @@ class Logout(Command.Command):
         SUCCESS_MESSAGE = "Logged out."
         FAILURE_MESSAGE = "Error logging out."
 
+        if len(args) != 1:
+            self.environment.debug("Invalid args.")
+            return FAILURE_MESSAGE
+
         if self.environment.user is None:
             self.environment.debug("No user is logged in.")
             return FAILURE_MESSAGE
